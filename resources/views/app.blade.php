@@ -9,6 +9,7 @@
         <link rel="icon" type="image/x-icon" href="/favicon.ico">
 
         <title>Roast</title>
+        <script src="https://webapi.amap.com/maps?v=1.4.8&key=356040dfc7806d01e8b5c22a1b87b069"></script>
 
         <script type='text/javascript'>
              window.Laravel = <?php echo json_encode([
