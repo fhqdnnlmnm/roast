@@ -42,7 +42,9 @@ export const users = {
      */
     getters: {
        getUserLoadStatus(state){
-           return state.userLoadStatus;
+           return function(){
+              return state.userLoadStatus;
+           }
        },
        getUser(state){
            return state.user;

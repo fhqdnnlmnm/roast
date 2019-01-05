@@ -12,5 +12,6 @@ switch( process.env.NODE_ENV) {
 
 export const ROAST_CONFIG = {
     API_URL:api_url,
+    APP_URL:'http://roast.test',
     GAODE_MAPS_JS_API_KEY:gaode_maps_js_api_key
 }

@@ -72,11 +72,14 @@ nav.top-navigation{
         </ul>
 
         <div class="right">
-            <img class="avatar" :src="user.avatar" v-show="userLoadStatus == 2"/>
+            <img class="avatar" v-if="user != '' && userLoadStatus === 2" :src="user.avatar" v-show="userLoadStatus === 2"/>
+            <span class="logout" v-if="user != '' && userLoadStatus === 2" v-on:click="logout()">退出</span>
+            <span class="login" v-if="user == ''" v-on:click="login()">登录</span>
         </div>
     </div>
 </template>
 <script>
+    import {EventBus} from '../../event-bus.js';
     export default {
         data:function(){
             return {
@@ -92,6 +95,16 @@ nav.top-navigation{
             },
             user(){
                 return this.$store.getters.getUser;
+            }
+        },
+        methods:{
+            login(){
+                this.$store.dispatch('logoutUser');
+                 window.location = '/logout';
+            },
+            logout(){
+                this.$store.dispatch('logoutUser');
+                window.location='/logout';
             }
         }
     }

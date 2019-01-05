@@ -15,7 +15,13 @@ export const cafes = {
         cafe: {},
         cafeLoadStatus: 0,
 
-        cafeAddStatus:0
+        cafeAddStatus:0,
+
+        cafeLikeAcionStatus:0,
+        cafeUnlikeActionStatus:0,
+
+        cafeLiked:false
+
     },
     /**
      * Defines the actions used to retrieve the data.
@@ -38,7 +44,7 @@ export const cafes = {
         loadCafe( { commit }, data ){
             commit( 'setCafeLoadStatus', 1 );
 
-            CafeAPI.getCafe( data.id )
+            CafeAPI.getsCafe( data.id )
                 .then( function( response ){
                     commit( 'setCafe', response.data );
                     commit( 'setCafeLoadStatus', 2 );
@@ -52,15 +58,57 @@ export const cafes = {
 
         addCafe({commit,state,dispatch},data){
             commit('setCafeAddStatus',1);
-            CafeAPI.postAddNewCafe(data.name,data.address,data.city,data.state,data.zip)
-                    .then(function(response){
-                        commit('setCafeAddStatus',2);
+            CafeAPI.postAddNewCafe(data.name, data.locations, data.website, data.description, data.roaster)
+                    .then(function (response) {
+                        commit('setCafeAddStatus', 2);
                         dispatch('loadCafes');
                     })
-                    .catch(function(){
-                        commit('setCafeAddStatus',3);
+                    .catch(function () {
+                        commit('setCafeAddStatus', 3);
                     });
-        }
+        },
+
+        likeCafe({commit,state},data){
+            commit('setCafeLikeActionStatus',1);
+            CafeAPI.postLikeCafe(data.id)
+            .then(function(response){
+                commit('setCafeLikedStatus',true);
+                commit('setCafeLikeActionStatus',2);
+            })
+            .catch(function(){
+                commit('setCafeLikeActionStatus',3);
+            })
+        },
+
+        unlikeCafe({commit,state},data){
+            commit('setCafeUnlikeActionStatus', 1);
+
+            CafeAPI.deleteLikeCafe(data.id)
+                .then(function (response) {
+                    commit('setCafeLikedStatus', false);
+                    commit('setCafeUnlikeActionStatus', 2);
+                })
+                .catch(function () {
+                    commit('setCafeUnlikeActionStatus', 3);
+                });
+        },
+        loadCafe({commit}, data) {
+            commit('setCafeLikedStatus', false);
+            commit('setCafeLoadStatus', 1);
+         
+            CafeAPI.getCafe(data.id)
+                .then(function (response) {
+                    commit('setCafe', response.data);
+                    if (response.data.user_like.length > 0) {
+                        commit('setCafeLikedStatus', true);
+                    }
+                    commit('setCafeLoadStatus', 2);
+                })
+                .catch(function () {
+                    commit('setCafe', {});
+                    commit('setCafeLoadStatus', 3);
+                });
+         }
     },
     /**
      * Defines the mutations used
@@ -84,6 +132,18 @@ export const cafes = {
 
         setCafeAddStatus(state,status){
             state.cafeAddStatus = status;
+        },
+
+        setCafeLikeActionStatus(state,status){
+            state.cafeLikeAcionStatus =status;
+        },
+
+        setCafeLikedStatus(state,status){
+            state.cafeLiked=status;
+        },
+
+        setCafeUnlikeActionStatus(state,status){
+            state.cafeUnlikeActionStatus =status;
         }
     },
     /**
@@ -108,6 +168,18 @@ export const cafes = {
 
         getCafeAddStatus(state){
             return state.cafeAddStatus;
+        },
+
+        getCafeLikedStatus(state){
+            return state.cafeLiked;
+        },
+
+        getCafeLikeActionStatus(state){
+            return state.cafeLikeAcionStatus;
+        },
+
+        getCafeUnlikeActionStatus(state){
+            return state.cafeUnlikeActionStatus;
         }
     }
 };

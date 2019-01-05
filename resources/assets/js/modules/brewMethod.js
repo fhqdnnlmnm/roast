@@ -21,7 +21,7 @@ export const brewMethods = {
             BrewMethodAPI.getBrewMethods()
                 .then(function (response) {
                     // Sets the brew methods on a successful response.
-                    commit('setBrewMethods', response);
+                    commit('setBrewMethods', response.data);
                     commit('setBrewMethodsLoadStatus', 2);
                 })
                 .catch(function () {

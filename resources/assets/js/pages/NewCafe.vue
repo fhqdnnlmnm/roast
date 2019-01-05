@@ -67,6 +67,9 @@
                         <label v-bind:for="'brew-method-'+brewMethod.id+'-'+key">{{ brewMethod.method }}</label>
                     </span>
                 </div>
+                <div class="large-12 mediun-12 small-12 cell">
+                    <tags-input v-bind:unique="key"></tags-input>
+                </div>
                 <div class="large-12 medium-12 small-12 cell">
                     <a class="button" v-on:click="removeLocation(key)">移除位置</a>
                 </div>
@@ -85,7 +88,12 @@
 </template>
 
 <script>
+import TagsInput from '../components/global/forms/TagsInput.vue';
+import { EventBus } from '../event-bus.js';
   export default {
+      components:{
+          TagsInput
+      },
     data(){
        return {
             name: '',
@@ -112,7 +120,7 @@
     },
     methods:{
         addLocation(){
-            this.locations.push({name:'',address:'',city:'',state:'',zip:'',methodsAvailable:[]});
+            this.locations.push({name:'',address:'',city:'',state:'',zip:'',methodsAvailable:[],tags:''});
             this.validations.locations.push({
                 address:{
                     is_valid:true,
@@ -132,8 +140,12 @@
                 }
             })
         },
+        removeLocation(key){
+            this.locations.splice(key,1);
+            this.validations.locations.splice(key,1);
+        },
       submitNewCafe:function(){
-        if (this.validateNewCafe()) {
+        if (this.validNewCafeForm()) {
             this.$store.dispatch('addCafe', {
                 name: this.name,
                 locations: this.locations,
@@ -198,6 +210,31 @@
             }
         }
         return validNewCafeForm;
+      },
+      cleareForm(){
+           this.name = '';
+            this.locations = [];
+            this.website = '';
+            this.description = '';
+            this.roaster = false;
+            this.validations = {
+                name: {
+                    is_valid: true,
+                    text: ''
+                },
+                locations: [],
+                oneLocation: {
+                    is_valid: true,
+                    text: ''
+                },
+                website: {
+                    is_valid: true,
+                    text: ''
+                }
+            };
+            
+            this.addLocation();
+            EventBus.$emit('clear-tags');
       }
     },
     created(){
@@ -206,8 +243,27 @@
     computed:{
         brewMethods(){
             return this.$store.getters.getBrewMethods;
+        },
+        addCafeStatus(){
+            return this.$store.getters.getCafeAddStatus;
         }
-    }
+    },
+    watch:{
+        'addCafeStatus':function(){
+            if(this.addCafeStatus ===2 ){
+                $("#cafe-added-successfully").show().delay(5000).fadeOut();
+            }
 
+            if (this.addCafeStatus === 3) {
+            // 添加失败
+            $("#cafe-added-unsuccessfully").show().delay(5000).fadeOut();
+            }
+        }
+    },
+    mounted(){
+        EventBus.$on('tags-edit',function(tagsAdded){
+            this.locations[tagsAdded.unique].tags=tagsAdded.tags;
+        }.bind(this));
+    }
   }
 </script>
